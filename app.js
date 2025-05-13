@@ -12,17 +12,19 @@ const userRoutes = require('./routes/userRoutes');
 dotenv.config();
 
 const app = express();
-console.log('Loaded JWT_SECRET:', process.env.JWT_SECRET);
+
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Routes
+console.log('Registering routes...');
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/users', userRoutes);
+console.log('Registered /api/users routes');
 app.use('/api/appointments', appointmentRoutes);
 
 // Mock VietQR endpoint
@@ -48,4 +50,3 @@ mongoose.connect(process.env.MONGO_URI, {
 }).catch((error) => {
     console.error('Lỗi kết nối MongoDB:', error);
 });
-

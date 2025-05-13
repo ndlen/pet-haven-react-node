@@ -42,10 +42,29 @@ exports.login = async (req, res) => {
             return res.status(401).json({ error: 'Email hoặc mật khẩu không đúng' });
         }
 
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
-        res.json({ data: { token, user: { id: user._id, fullname: user.fullname, email, phone: user.phone, dob: user.dob, gender: user.gender, role: user.role } } });
+        const token = jwt.sign(
+            { id: user._id, role: user.role || 'user' },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+        );
+
+        res.json({
+            data: {
+                token,
+                user: {
+                    _id: user._id,
+                    fullname: user.fullname,
+                    email: user.email,
+                    phone: user.phone,
+                    dob: user.dob,
+                    gender: user.gender,
+                    role: user.role || 'user'
+                }
+            }
+        });
     } catch (error) {
-        res.status(500).json({ error: 'Đã xảy ra lỗi khi đăng nhập' });
+        console.error('Login error:', error);
+        res.status(500).json({ error: 'Lỗi server' });
     }
 };
 

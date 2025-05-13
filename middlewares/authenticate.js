@@ -1,23 +1,29 @@
 const jwt = require('jsonwebtoken');
 
-module.exports = (req, res, next) => {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    console.log('Token received:', token);
-    if (!token) {
-        console.log('No token provided');
-        return res.status(401).json({ error: 'Không có token, vui lòng đăng nhập' });
-    }
+module.exports = async (req, res, next) => {
     try {
-        console.log('JWT_SECRET:', process.env.JWT_SECRET);
+        const token = req.header('Authorization')?.replace('Bearer ', '');
+        if (!token) {
+            return res.status(401).json({ error: 'Không có token, vui lòng đăng nhập' });
+        }
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log('Decoded token:', decoded);
-        req.user = decoded;
+        const User = require('../models/User');
+        const user = await User.findById(decoded.id).select('-password');
+
+        if (!user) {
+            return res.status(401).json({ error: 'Người dùng không tồn tại' });
+        }
+
+        req.user = {
+            id: user._id.toString(),
+            role: user.role || 'user',
+            email: user.email
+        };
+        console.log('Authenticated user:', req.user);
         next();
     } catch (error) {
-        console.log('Token verification error:', error.message);
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({ error: 'Token đã hết hạn, vui lòng đăng nhập lại' });
-        }
-        return res.status(403).json({ error: 'Không có quyền truy cập' });
+        console.error('Authentication error:', error);
+        res.status(401).json({ error: 'Token không hợp lệ' });
     }
 };
