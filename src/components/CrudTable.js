@@ -1,5 +1,6 @@
 import React from "react";
 import { Table, Button, Popconfirm, message } from "antd";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 const CrudTable = ({ data, columns, onEdit, onDelete }) => {
     const actionColumn = {
@@ -8,7 +9,7 @@ const CrudTable = ({ data, columns, onEdit, onDelete }) => {
         render: (_, record) => (
             <span>
                 <Button type="link" onClick={() => onEdit(record)}>
-                    Sửa
+                    <EditOutlined />
                 </Button>
                 <Popconfirm
                     title="Bạn có chắc chắn muốn xóa?"
@@ -20,7 +21,7 @@ const CrudTable = ({ data, columns, onEdit, onDelete }) => {
                     cancelText="Không"
                 >
                     <Button type="link" danger>
-                        Xóa
+                        <DeleteOutlined />
                     </Button>
                 </Popconfirm>
             </span>

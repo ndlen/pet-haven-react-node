@@ -20,9 +20,7 @@ const Navbar = () => {
         { key: "/admin/foods", icon: <ShoppingCartOutlined />, label: "Thức ăn" },
         { key: "/admin/services", icon: <ShoppingCartOutlined />, label: "Dịch vụ" },
         { key: "/admin/users", icon: <UserOutlined />, label: "Người dùng" },
-        { key: "/admin/schedule", icon: <CalendarOutlined />, label: "Lịch làm việc" },
         { key: "/admin/employees", icon: <UserOutlined />, label: "Nhân viên" },
-        { key: "/admin/statistics", icon: <BarChartOutlined />, label: "Thống kê" },
     ];
 
     return (

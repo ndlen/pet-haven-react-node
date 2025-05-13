@@ -167,53 +167,195 @@ const CustomerHome = () => {
     }, []);
 
     return (
-        <div style={{ background: "var(--background-color)", minHeight: "100vh" }}>
-            <div style={{ padding: "80px 50px" }}>
-                <div style={{ display: "flex", alignItems: "center", background: "var(--modal-bg)", padding: "50px", borderRadius: "10px", marginBottom: "40px" }}>
-                    <div style={{ flex: 1, color: "var(--text-color)" }}>
-                        <Title level={1} style={{ color: "var(--text-color)" }}>
+        <div
+            style={{
+                background: "var(--background-color)",
+                minHeight: "100vh",
+            }}
+        >
+            <div
+                style={{
+                    padding: "clamp(20px, 5vw, 80px) clamp(20px, 5vw, 50px)",
+                }}
+            >
+                {/* Phần "Chăm sóc thú cưng với sự tận tâm nhất!" */}
+                <div
+                    style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        background: "var(--modal-bg)",
+                        padding: "clamp(20px, 5vw, 50px)",
+                        borderRadius: "10px",
+                        marginBottom: "40px",
+                        gap: "20px",
+                    }}
+                >
+                    <div
+                        style={{
+                            flex: 1,
+                            color: "var(--text-color)",
+                            minWidth: "250px",
+                            textAlign: "left", // Căn trái
+                        }}
+                    >
+                        <Title
+                            level={1}
+                            style={{
+                                color: "var(--text-color)",
+                                fontSize: "clamp(24px, 5vw, 32px)",
+                                textAlign: "left", // Căn trái
+                            }}
+                        >
                             Chăm sóc thú cưng với sự tận tâm nhất! 🐾
                         </Title>
-                        <Paragraph style={{ color: "var(--text-color)" }}>
+                        <Paragraph
+                            style={{
+                                color: "var(--text-color)",
+                                fontSize: "clamp(14px, 3vw, 16px)",
+                                textAlign: "left", // Căn trái
+                            }}
+                        >
                             Hãy để chúng tôi giúp bạn chăm sóc thú cưng với các dịch vụ tốt nhất.
                         </Paragraph>
-                        <Button type="primary" onClick={() => navigate("/customer/services")}>
+                        <Button
+                            type="primary"
+                            onClick={() => navigate("/customer/services")}
+                        >
                             Khám phá ngay
                         </Button>
                     </div>
-                    <Image src={background} width={400} style={{ borderRadius: "10px" }} />
+                    <Image
+                        src={background}
+                        style={{
+                            width: "100%",
+                            maxWidth: "400px",
+                            borderRadius: "10px",
+                            objectFit: "cover",
+                        }}
+                    />
                 </div>
-                <div style={{ display: "flex", alignItems: "center", marginBottom: "40px" }}>
-                    <div style={{ flex: 1, color: "var(--text-color)" }}>
-                        <Title level={2} style={{ color: "var(--text-color)" }}>
+
+                {/* Phần "Về Pet Haven" */}
+                <div
+                    style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        marginBottom: "40px",
+                        gap: "20px",
+                    }}
+                >
+                    <div
+                        style={{
+                            flex: 1,
+                            color: "var(--text-color)",
+                            minWidth: "250px",
+                            textAlign: "left", // Căn trái
+                        }}
+                    >
+                        <Title
+                            level={2}
+                            style={{
+                                color: "var(--text-color)",
+                                fontSize: "clamp(20px, 4vw, 28px)",
+                                textAlign: "left", // Căn trái
+                            }}
+                        >
                             Về Pet Haven 🏡
                         </Title>
-                        <Paragraph style={{ color: "var(--text-color)" }}>
+                        <Paragraph
+                            style={{
+                                color: "var(--text-color)",
+                                fontSize: "clamp(14px, 3vw, 16px)",
+                                textAlign: "left", // Căn trái
+                            }}
+                        >
                             Pet Haven là nơi mang đến những dịch vụ chăm sóc thú cưng tốt nhất, từ thức ăn chất lượng, spa, đến dịch vụ y tế và tư vấn sức khỏe.
                         </Paragraph>
-                        <Paragraph style={{ color: "var(--text-color)" }}>
+                        <Paragraph
+                            style={{
+                                color: "var(--text-color)",
+                                fontSize: "clamp(14px, 3vw, 16px)",
+                                textAlign: "left", // Căn trái
+                            }}
+                        >
                             Chúng tôi cam kết cung cấp những sản phẩm và dịch vụ tốt nhất để đảm bảo thú cưng của bạn luôn khỏe mạnh và hạnh phúc.
                         </Paragraph>
                     </div>
-                    <Image src={haven} width={400} style={{ borderRadius: "10px" }} />
+                    <Image
+                        src={haven}
+                        style={{
+                            width: "100%",
+                            maxWidth: "400px",
+                            borderRadius: "10px",
+                            objectFit: "cover",
+                        }}
+                    />
                 </div>
+
+                {/* Phần "Dịch vụ nổi bật" */}
                 <div style={{ marginBottom: "40px" }}>
-                    <Title level={2} style={{ color: "var(--text-color)" }}>
+                    <Title
+                        level={2}
+                        style={{
+                            color: "var(--text-color)",
+                            fontSize: "clamp(20px, 4vw, 28px)",
+                            textAlign: "left", // Căn trái
+                        }}
+                    >
                         Dịch vụ nổi bật 🏆
                     </Title>
                     {services.length === 0 ? (
-                        <Paragraph style={{ color: "var(--text-color)" }}>
+                        <Paragraph
+                            style={{
+                                color: "var(--text-color)",
+                                fontSize: "clamp(14px, 3vw, 16px)",
+                                textAlign: "left", // Căn trái
+                            }}
+                        >
                             Hiện không có dịch vụ nào để hiển thị.
                         </Paragraph>
                     ) : (
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px" }}>
+                        <div
+                            style={{
+                                display: "grid",
+                                gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+                                gap: "20px",
+                            }}
+                        >
                             {services.map((service) => (
-                                <Card key={service._id} style={{ background: "var(--table-bg)" }}>
-                                    <i className="fa-solid fa-paw" style={{ fontSize: "24px", color: "#FF8C00" }}></i>
-                                    <Title level={4} style={{ color: "var(--text-color)" }}>
+                                <Card
+                                    key={service._id}
+                                    style={{
+                                        background: "var(--table-bg)",
+                                        padding: "20px",
+                                    }}
+                                >
+                                    <i
+                                        className="fa-solid fa-paw"
+                                        style={{
+                                            fontSize: "clamp(20px, 5vw, 24px)",
+                                            color: "#FF8C00",
+                                        }}
+                                    ></i>
+                                    <Title
+                                        level={4}
+                                        style={{
+                                            color: "var(--text-color)",
+                                            fontSize: "clamp(16px, 3vw, 20px)",
+                                            textAlign: "left", // Căn trái
+                                        }}
+                                    >
                                         {service.nameService || "Không có tên"}
                                     </Title>
-                                    <Paragraph style={{ color: "var(--text-color)" }}>
+                                    <Paragraph
+                                        style={{
+                                            color: "var(--text-color)",
+                                            fontSize: "clamp(12px, 2.5vw, 14px)",
+                                            textAlign: "left", // Căn trái
+                                        }}
+                                    >
                                         {service.describe || "Chưa có mô tả"}
                                     </Paragraph>
                                 </Card>
@@ -221,29 +363,87 @@ const CustomerHome = () => {
                         </div>
                     )}
                 </div>
+
+                {/* Phần "Sản phẩm nổi bật" */}
                 <div style={{ marginBottom: "40px" }}>
-                    <Title level={2} style={{ color: "var(--text-color)" }}>
+                    <Title
+                        level={2}
+                        style={{
+                            color: "var(--text-color)",
+                            fontSize: "clamp(20px, 4vw, 28px)",
+                            textAlign: "left", // Căn trái
+                        }}
+                    >
                         Sản phẩm nổi bật 🛍️
                     </Title>
                     {products.length === 0 ? (
-                        <Paragraph style={{ color: "var(--text-color)" }}>
+                        <Paragraph
+                            style={{
+                                color: "var(--text-color)",
+                                fontSize: "clamp(14px, 3vw, 16px)",
+                                textAlign: "left", // Căn trái
+                            }}
+                        >
                             Hiện không có sản phẩm nào để hiển thị.
                         </Paragraph>
                     ) : (
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px" }}>
+                        <div
+                            style={{
+                                display: "grid",
+                                gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+                                gap: "20px",
+                            }}
+                        >
                             {products.map((product) => (
-                                <Card key={product._id} hoverable style={{ background: "var(--table-bg)" }}>
-                                    <Image src={product.picture || "https://via.placeholder.com/150"} height={150} style={{ objectFit: "cover" }} />
-                                    <Title level={4} style={{ color: "var(--text-color)" }}>
+                                <Card
+                                    key={product._id}
+                                    hoverable
+                                    style={{
+                                        background: "var(--table-bg)",
+                                        padding: "20px",
+                                    }}
+                                >
+                                    <Image
+                                        src={product.picture || "https://via.placeholder.com/150"}
+                                        height={150}
+                                        style={{
+                                            width: "100%",
+                                            objectFit: "cover",
+                                            borderRadius: "8px",
+                                        }}
+                                    />
+                                    <Title
+                                        level={4}
+                                        style={{
+                                            color: "var(--text-color)",
+                                            fontSize: "clamp(16px, 3vw, 20px)",
+                                            textAlign: "left", // Căn trái
+                                        }}
+                                    >
                                         {product.name || "Không có tên"}
                                     </Title>
-                                    <Paragraph style={{ color: "var(--text-color)" }}>
+                                    <Paragraph
+                                        style={{
+                                            color: "var(--text-color)",
+                                            fontSize: "clamp(12px, 2.5vw, 14px)",
+                                            textAlign: "left", // Căn trái
+                                        }}
+                                    >
                                         {product.category || "Không xác định"}
                                     </Paragraph>
-                                    <Paragraph style={{ color: "#FFD700" }}>
+                                    <Paragraph
+                                        style={{
+                                            color: "#FFD700",
+                                            fontSize: "clamp(12px, 2.5vw, 14px)",
+                                            textAlign: "left", // Căn trái
+                                        }}
+                                    >
                                         {product.price ? product.price.toLocaleString() : "0"} VND
                                     </Paragraph>
-                                    <Button type="primary" onClick={() => navigate("/customer/foods")}>
+                                    <Button
+                                        type="primary"
+                                        onClick={() => navigate("/customer/foods")}
+                                    >
                                         Mua ngay
                                     </Button>
                                 </Card>
@@ -251,76 +451,223 @@ const CustomerHome = () => {
                         </div>
                     )}
                 </div>
+
+                {/* Phần "Khách hàng nói gì về chúng tôi?" */}
                 <div style={{ marginBottom: "40px" }}>
-                    <Title level={2} style={{ color: "var(--text-color)" }}>
+                    <Title
+                        level={2}
+                        style={{
+                            color: "var(--text-color)",
+                            fontSize: "clamp(20px, 4vw, 28px)",
+                            textAlign: "left", // Căn trái
+                        }}
+                    >
                         Khách hàng nói gì về chúng tôi? 🐾
                     </Title>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "20px" }}>
-                        <Card style={{ background: "var(--table-bg)" }}>
-                            <Paragraph style={{ color: "var(--text-color)" }}>
+                    <div
+                        style={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+                            gap: "20px",
+                        }}
+                    >
+                        <Card
+                            style={{
+                                background: "var(--table-bg)",
+                                padding: "20px",
+                            }}
+                        >
+                            <Paragraph
+                                style={{
+                                    color: "var(--text-color)",
+                                    fontSize: "clamp(12px, 2.5vw, 14px)",
+                                    textAlign: "left", // Căn trái
+                                }}
+                            >
                                 "Dịch vụ chăm sóc thú cưng ở đây thật tuyệt vời! Nhân viên rất thân thiện và chuyên nghiệp!"
                             </Paragraph>
-                            <Title level={5} style={{ color: "var(--text-color)" }}>
+                            <Title
+                                level={5}
+                                style={{
+                                    color: "var(--text-color)",
+                                    fontSize: "clamp(14px, 3vw, 16px)",
+                                    textAlign: "left", // Căn trái
+                                }}
+                            >
                                 - Nguyễn Văn A
                             </Title>
                         </Card>
-                        <Card style={{ background: "var(--table-bg)" }}>
-                            <Paragraph style={{ color: "var(--text-color)" }}>
+                        <Card
+                            style={{
+                                background: "var(--table-bg)",
+                                padding: "20px",
+                            }}
+                        >
+                            <Paragraph
+                                style={{
+                                    color: "var(--text-color)",
+                                    fontSize: "clamp(12px, 2.5vw, 14px)",
+                                    textAlign: "left", // Căn trái
+                                }}
+                            >
                                 "Chó cưng của tôi được tắm và cắt tỉa lông rất đẹp, chắc chắn sẽ quay lại!"
                             </Paragraph>
-                            <Title level={5} style={{ color: "var(--text-color)" }}>
+                            <Title
+                                level={5}
+                                style={{
+                                    color: "var(--text-color)",
+                                    fontSize: "clamp(14px, 3vw, 16px)",
+                                    textAlign: "left", // Căn trái
+                                }}
+                            >
                                 - Trần Thị B
                             </Title>
                         </Card>
-                        <Card style={{ background: "var(--table-bg)" }}>
-                            <Paragraph style={{ color: "var(--text-color)" }}>
+                        <Card
+                            style={{
+                                background: "var(--table-bg)",
+                                padding: "20px",
+                            }}
+                        >
+                            <Paragraph
+                                style={{
+                                    color: "var(--text-color)",
+                                    fontSize: "clamp(12px, 2.5vw, 14px)",
+                                    textAlign: "left", // Căn trái
+                                }}
+                            >
                                 "Thức ăn và phụ kiện chất lượng cao, giá cả hợp lý, rất đáng để trải nghiệm!"
                             </Paragraph>
-                            <Title level={5} style={{ color: "var(--text-color)" }}>
+                            <Title
+                                level={5}
+                                style={{
+                                    color: "var(--text-color)",
+                                    fontSize: "clamp(14px, 3vw, 16px)",
+                                    textAlign: "left", // Căn trái
+                                }}
+                            >
                                 - Lê Văn C
                             </Title>
                         </Card>
                     </div>
                 </div>
+
+                {/* Phần "Câu hỏi thường gặp" */}
                 <div style={{ marginBottom: "40px" }}>
-                    <Title level={2} style={{ color: "var(--text-color)" }}>
+                    <Title
+                        level={2}
+                        style={{
+                            color: "var(--text-color)",
+                            fontSize: "clamp(20px, 4vw, 28px)",
+                            textAlign: "left", // Căn trái
+                        }}
+                    >
                         Câu hỏi thường gặp ❓
                     </Title>
-                    <Card style={{ background: "var(--table-bg)" }}>
+                    <Card
+                        style={{
+                            background: "var(--table-bg)",
+                            padding: "20px",
+                        }}
+                    >
                         <div style={{ marginBottom: "16px" }}>
-                            <Title level={4} style={{ color: "var(--text-color)" }}>
+                            <Title
+                                level={4}
+                                style={{
+                                    color: "var(--text-color)",
+                                    fontSize: "clamp(16px, 3vw, 20px)",
+                                    textAlign: "left", // Căn trái
+                                }}
+                            >
                                 Tôi có thể đặt hàng trước bao lâu? <span>+</span>
                             </Title>
-                            <Paragraph style={{ color: "var(--text-color)" }}>
+                            <Paragraph
+                                style={{
+                                    color: "var(--text-color)",
+                                    fontSize: "clamp(12px, 2.5vw, 14px)",
+                                    textAlign: "left", // Căn trái
+                                }}
+                            >
                                 Bạn có thể đặt hàng bất kỳ lúc nào, chúng tôi sẽ xử lý trong vòng 24 giờ.
                             </Paragraph>
                         </div>
                         <div style={{ marginBottom: "16px" }}>
-                            <Title level={4} style={{ color: "var(--text-color)" }}>
+                            <Title
+                                level={4}
+                                style={{
+                                    color: "var(--text-color)",
+                                    fontSize: "clamp(16px, 3vw, 20px)",
+                                    textAlign: "left", // Căn trái
+                                }}
+                            >
                                 Cửa hàng có bán thức ăn cho mọi loại thú cưng không? <span>+</span>
                             </Title>
-                            <Paragraph style={{ color: "var(--text-color)" }}>
+                            <Paragraph
+                                style={{
+                                    color: "var(--text-color)",
+                                    fontSize: "clamp(12px, 2.5vw, 14px)",
+                                    textAlign: "left", // Căn trái
+                                }}
+                            >
                                 Chúng tôi cung cấp đa dạng thức ăn cho chó, mèo và một số vật nuôi khác.
                             </Paragraph>
                         </div>
                         <div>
-                            <Title level={4} style={{ color: "var(--text-color)" }}>
+                            <Title
+                                level={4}
+                                style={{
+                                    color: "var(--text-color)",
+                                    fontSize: "clamp(16px, 3vw, 20px)",
+                                    textAlign: "left", // Căn trái
+                                }}
+                            >
                                 Có dịch vụ giao hàng tận nơi không? <span>+</span>
                             </Title>
-                            <Paragraph style={{ color: "var(--text-color)" }}>
+                            <Paragraph
+                                style={{
+                                    color: "var(--text-color)",
+                                    fontSize: "clamp(12px, 2.5vw, 14px)",
+                                    textAlign: "left", // Căn trái
+                                }}
+                            >
                                 Chúng tôi hỗ trợ giao hàng tận nơi trong phạm vi 10km từ cửa hàng.
                             </Paragraph>
                         </div>
                     </Card>
                 </div>
-                <div style={{ background: "var(--modal-bg)", padding: "50px", textAlign: "center", borderRadius: "10px" }}>
-                    <Title level={2} style={{ color: "var(--text-color)" }}>
+
+                {/* Phần Call-to-Action cuối */}
+                <div
+                    style={{
+                        background: "var(--modal-bg)",
+                        padding: "clamp(20px, 5vw, 50px)",
+                        textAlign: "center",
+                        borderRadius: "10px",
+                    }}
+                >
+                    <Title
+                        level={2}
+                        style={{
+                            color: "var(--text-color)",
+                            fontSize: "clamp(20px, 4vw, 28px)",
+                            textAlign: "center", // Giữ căn giữa cho phần này
+                        }}
+                    >
                         Hãy chăm sóc thú cưng của bạn ngay hôm nay!
                     </Title>
-                    <Paragraph style={{ color: "var(--text-color)" }}>
+                    <Paragraph
+                        style={{
+                            color: "var(--text-color)",
+                            fontSize: "clamp(14px, 3vw, 16px)",
+                            textAlign: "center", // Giữ căn giữa cho phần này
+                        }}
+                    >
                         Đặt hàng ngay để thú cưng của bạn được hưởng dịch vụ và sản phẩm tốt nhất.
                     </Paragraph>
-                    <Button type="primary" onClick={() => navigate("/customer/services")}>
+                    <Button
+                        type="primary"
+                        onClick={() => navigate("/customer/services")}
+                    >
                         Đặt hàng ngay
                     </Button>
                 </div>
@@ -1474,7 +1821,7 @@ const CustomerProfile = () => {
             }
 
             try {
-                const response = await axios.get("/api/users/me", {
+                const response = await axios.get("http://localhost:3000/api/users/me", {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const userData = response.data.data;
@@ -1500,39 +1847,7 @@ const CustomerProfile = () => {
 
     const handleSubmit = async (values) => {
         console.log("Submitting values:", values);
-        const token = localStorage.getItem("token");
-        const userData = JSON.parse(localStorage.getItem("user"));
-
-        if (!token || !userData || !userData._id || !userData.role) {
-            message.error("Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại!");
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-            navigate("/customer/login");
-            return;
-        }
-
-        try {
-            console.log("Verifying user with token:", token);
-            const response = await axios.get("http://localhost:3000/api/users/me", {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const serverUserData = response.data.data;
-            if (serverUserData._id !== userData._id || serverUserData.role !== userData.role) {
-                console.error("User data mismatch:", { local: userData, server: serverUserData });
-                message.error("Thông tin người dùng không đồng bộ. Vui lòng đăng nhập lại!");
-                localStorage.removeItem("token");
-                localStorage.removeItem("user");
-                navigate("/customer/login");
-                return;
-            }
-        } catch (error) {
-            console.error("Error verifying user:", error.response?.data || error.message);
-            message.error("Không thể xác thực người dùng. Vui lòng đăng nhập lại!");
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-            navigate("/customer/login");
-            return;
-        }
+        console.log("Request URL:", "http://localhost:3000/api/users/me");
 
         const { phone, dob, fullname, gender } = values;
         const phoneRegex = /^\+?[1-9]\d{8,14}$/;
@@ -1562,30 +1877,26 @@ const CustomerProfile = () => {
         }
 
         try {
-            console.log("Sending PUT request with data:", { phone, dob, fullname, gender });
-            console.log("Token sent:", token);
-            const response = await axios.put("http://localhost:3000/api/users/me", { phone, dob, fullname, gender }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const updatedUserData = { ...response.data.data, role: userData.role };
+            const token = localStorage.getItem("token");
+            const response = await axios.put(
+                "http://localhost:3000/api/users/me",
+                { phone, dob, fullname, gender },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            const updatedUserData = response.data.data;
             localStorage.setItem("user", JSON.stringify(updatedUserData));
             message.success("Thông tin đã được cập nhật!");
         } catch (error) {
             console.error("Error updating profile:", error.response?.data || error.message);
-            message.error(error.response?.data?.error || "Lỗi khi cập nhật thông tin!");
+            message.error(error.response?.data?.error || "Lỗi khi cập nhật thông tin. Vui lòng thử lại!");
         }
     };
 
     const handleChangePassword = async (values) => {
         console.log("Changing password with values:", values);
-        const { password, confirmPassword } = values;
-        const token = localStorage.getItem("token");
+        console.log("Request URL:", "http://localhost:3000/api/users/me");
 
-        if (!token) {
-            message.error("Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại!");
-            navigate("/customer/login");
-            return;
-        }
+        const { password, confirmPassword } = values;
 
         if (password && password.length < 6) {
             message.error("Mật khẩu phải có ít nhất 6 ký tự!");
@@ -1599,16 +1910,17 @@ const CustomerProfile = () => {
 
         if (password) {
             try {
-                console.log("Sending PUT request for password change:", { password });
-                console.log("Token sent:", token);
-                const response = await axios.put("http://localhost:3000/api/users/me", { password }, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const token = localStorage.getItem("token");
+                await axios.put(
+                    "http://localhost:3000/api/users/me",
+                    { password },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
                 message.success("Mật khẩu đã được cập nhật!");
                 form.setFieldsValue({ password: "", confirmPassword: "" });
             } catch (error) {
                 console.error("Error updating password:", error.response?.data || error.message);
-                message.error(error.response?.data?.error || "Lỗi khi cập nhật mật khẩu!");
+                message.error(error.response?.data?.error || "Lỗi khi cập nhật mật khẩu. Vui lòng thử lại!");
             }
         } else {
             message.info("Vui lòng nhập mật khẩu mới để thay đổi!");

@@ -20,27 +20,24 @@ const Users = () => {
     useEffect(() => {
         const verifyAdmin = async () => {
             try {
-                const response = await axios.get("/api/users/me");
+                const response = await axios.get("http://localhost:3000/api/users/me", {
+                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+                });
                 if (response.data.data.role !== "admin") {
-                    message.error("Bạn không có quyền truy cập trang này!");
+                    message.error("Bạn không có quyền truy cập!");
                     navigate("/login");
                     return;
                 }
 
                 NProgress.start();
-                const fetchUsers = async () => {
-                    try {
-                        const res = await axios.get("/api/users");
-                        setData(res.data.data || []);
-                        NProgress.done();
-                    } catch (error) {
-                        message.error("Không thể tải dữ liệu người dùng. Vui lòng thử lại sau!");
-                        NProgress.done();
-                    }
-                };
-                fetchUsers();
+                const res = await axios.get("http://localhost:3000/api/users", {
+                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+                });
+                setData(res.data.data || []);
+                NProgress.done();
             } catch (error) {
-                message.error("Bạn không có quyền truy cập trang này!");
+                console.error('Error verifying admin or fetching users:', error.message);
+                message.error("Không thể tải dữ liệu!");
                 navigate("/login");
                 NProgress.done();
             }
@@ -57,10 +54,9 @@ const Users = () => {
     ];
 
     const formFields = [
-        { name: "fullname", label: "Tên", type: "text" },
-        { name: "email", label: "Email", type: "text", disabled: true },
-        { name: "phone", label: "Số điện thoại", type: "text" },
-        { name: "password", label: "Mật khẩu mới", type: "text" },
+        { name: "fullname", label: "Tên", type: "text", rules: [{ required: true, message: "Vui lòng nhập tên!" }] },
+        { name: "phone", label: "Số điện thoại", type: "text", rules: [{ required: true, message: "Vui lòng nhập số điện thoại!" }, { pattern: /^\+?[1-9]\d{8,14}$/, message: "Số điện thoại không hợp lệ!" }] },
+        { name: "password", label: "Mật khẩu mới", type: "password", rules: [{ min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự!" }] },
         {
             name: "role",
             label: "Vai trò",
@@ -70,43 +66,56 @@ const Users = () => {
                 { value: "staff", label: "Nhân viên" },
                 { value: "admin", label: "Quản trị viên" },
             ],
+            rules: [{ required: true, message: "Vui lòng chọn vai trò!" }]
         },
     ];
 
     const handleEdit = (record) => {
-        setEditingRecord(record);
+        setEditingRecord({ ...record, password: '' }); // Clear password field
         setModalOpen(true);
     };
 
     const handleDelete = async (record) => {
         try {
-            await axios.delete(`/api/users/${record._id}`);
+            await axios.delete(`http://localhost:3000/api/users/${record._id}`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+            });
             setData(data.filter((item) => item._id !== record._id));
+            message.success("Xóa người dùng thành công!");
         } catch (error) {
+            console.error('Error deleting user:', error.message);
             message.error("Không thể xóa người dùng!");
         }
     };
 
     const handleSubmit = async (values) => {
         try {
-            if (editingRecord) {
-                await axios.put(`/api/users/${editingRecord._id}`, values);
-                setData(
-                    data.map((item) =>
-                        item._id === editingRecord._id ? { ...item, ...values } : item
-                    )
-                );
-                message.success("Cập nhật người dùng thành công!");
+            // Remove empty password field
+            const payload = { ...values };
+            if (!payload.password) {
+                delete payload.password;
             }
+            console.log('Submitting payload:', payload);
+
+            await axios.put(`http://localhost:3000/api/users/${editingRecord._id}`, payload, {
+                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+            });
+            setData(
+                data.map((item) =>
+                    item._id === editingRecord._id ? { ...item, ...payload } : item
+                )
+            );
+            message.success("Cập nhật người dùng thành công!");
             setModalOpen(false);
             setEditingRecord(null);
         } catch (error) {
-            message.error("Không thể lưu người dùng!");
+            console.error('Error updating user:', error.response?.data || error.message);
+            message.error(error.response?.data?.error || "Không thể lưu người dùng!");
         }
     };
 
     return (
-        <div style={{ background: "var(--background-color)" }}>
+        <div style={{ background: "var(--background-color)", padding: "20px" }}>
             <Title level={2} style={{ color: "var(--text-color)" }}>
                 Quản lý người dùng
             </Title>

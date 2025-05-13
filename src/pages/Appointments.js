@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Button, Typography, message, Tag } from "antd";
+import { Button, Typography, message, Tag, Select, Space } from "antd";
 import CrudTable from "../components/CrudTable";
 import CrudForm from "../components/CrudForm";
 import axios from "axios";
@@ -8,14 +8,17 @@ import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
+import * as XLSX from "xlsx";
 
 const { Title } = Typography;
+const { Option } = Select;
 
 const Appointments = () => {
     const { theme } = useContext(ThemeContext);
     const [data, setData] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [editingRecord, setEditingRecord] = useState(null);
+    const [reportPeriod, setReportPeriod] = useState("week");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -143,11 +146,79 @@ const Appointments = () => {
         }
     };
 
+    const filterAppointmentsByPeriod = (period) => {
+        const now = moment();
+        let startDate, endDate;
+
+        switch (period) {
+            case "week":
+                startDate = now.clone().startOf("week");
+                endDate = now.clone().endOf("week");
+                break;
+            case "month":
+                startDate = now.clone().startOf("month");
+                endDate = now.clone().endOf("month");
+                break;
+            case "year":
+                startDate = now.clone().startOf("year");
+                endDate = now.clone().endOf("year");
+                break;
+            default:
+                return data;
+        }
+
+        return data.filter((appointment) => {
+            const appointmentDate = moment(appointment.date);
+            return appointmentDate.isBetween(startDate, endDate, null, "[]");
+        });
+    };
+
+    const exportToExcel = () => {
+        const filteredData = filterAppointmentsByPeriod(reportPeriod);
+        const exportData = filteredData.map(({ fullname, phone, date, service, status }) => ({
+            Tên: fullname,
+            "Số điện thoại": phone,
+            "Thời gian": date ? moment(date).format("DD/MM/YYYY HH:mm") : "Chưa thiết lập",
+            "Dịch vụ": service,
+            "Trạng thái": status,
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Appointments");
+
+        // Auto-size columns
+        const colWidths = Object.keys(exportData[0] || {}).map((key) => ({
+            wch: Math.max(
+                key.length,
+                ...exportData.map((row) => (row[key] ? row[key].toString().length : 0))
+            ),
+        }));
+        worksheet["!cols"] = colWidths;
+
+        XLSX.writeFile(workbook, `Appointments_${reportPeriod}_${moment().format("YYYYMMDD")}.xlsx`);
+        message.success("Xuất báo cáo thành công!");
+    };
+
     return (
-        <div style={{ background: "var(--background-color)" }}>
+        <div style={{ background: "var(--background-color)", padding: 20 }}>
             <Title level={2} style={{ color: "var(--text-color)" }}>
                 Quản lý lịch hẹn
             </Title>
+            <Space style={{ marginBottom: 16 }}>
+                <Select
+                    value={reportPeriod}
+                    onChange={(value) => setReportPeriod(value)}
+                    style={{ width: 120 }}
+                >
+                    <Option value="week">Tuần</Option>
+                    <Option value="month">Tháng</Option>
+                    <Option value="year">Năm</Option>
+                </Select>
+                <Button type="primary" onClick={exportToExcel}>
+                    Xuất báo cáo Excel
+                </Button>
+            </Space>
             <CrudTable
                 data={data}
                 columns={columns}

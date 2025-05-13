@@ -9,10 +9,8 @@ import Services from "./pages/Services";
 import Users from "./pages/Users";
 import Login from "./pages/Login";
 import CustomerApp from "./customer/CustomerApp";
-import Schedule from "./pages/Schedule";
 import Employees from "./pages/Employees";
 import ErrorPage from "./pages/Error";
-import Statistics from "./pages/Statistics";
 import axios from "axios";
 import "./styles.css";
 
@@ -84,9 +82,7 @@ const App = () => {
                 { path: "foods", element: <Foods /> },
                 { path: "services", element: <Services /> },
                 { path: "users", element: <Users /> },
-                { path: "schedule", element: <Schedule /> },
                 { path: "employees", element: <Employees /> },
-                { path: "statistics", element: <Statistics /> },
                 { path: "*", element: <ErrorPage /> },
             ],
         },
