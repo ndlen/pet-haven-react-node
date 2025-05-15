@@ -7,7 +7,9 @@ import moment from "moment";
 import axios from "axios";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
+
 const { Title, Paragraph } = Typography;
+
 const CustomerCart = () => {
     const { theme } = useContext(ThemeContext);
     const [cart, setCart] = useState([]);
@@ -18,6 +20,7 @@ const CustomerCart = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const navigate = useNavigate();
 
+    // Tải giỏ hàng từ localStorage
     const loadCart = () => {
         const cartData = JSON.parse(localStorage.getItem("cart")) || [];
         const formattedCart = cartData.map((item) => ({
@@ -31,6 +34,7 @@ const CustomerCart = () => {
         loadCart();
     }, []);
 
+    // Tạo mã QR VietQR
     const generateVietQR = (orderId, total) => {
         const bankId = "970422";
         const accountNo = "0905859265";
@@ -38,7 +42,7 @@ const CustomerCart = () => {
         const accountNameRaw = "NGUYEN DUC LEN";
         const accountName = encodeURIComponent(accountNameRaw);
         const amount = Math.floor(parseInt(total, 10));
-        const shortOrderId = orderId.slice(0, 10);
+        const shortOrderId = String(orderId).toUpperCase().slice(0, 10); // Chuyển thành chữ hoa
         const descriptionRaw = `Thanh toan don hang ${shortOrderId}`;
         const description = encodeURIComponent(descriptionRaw).replace(/[^a-zA-Z0-9%]/g, "").slice(0, 50);
 
@@ -56,20 +60,20 @@ const CustomerCart = () => {
         }
 
         const qrUrl = `https://img.vietqr.io/image/${bankId}-${accountNo}-${template}.png?amount=${amount}&addInfo=${description}&accountName=${accountName}`;
-        console.log("URL VietQR được tạo:", qrUrl);
-        console.log("Thông tin VietQR:", { bankId, accountNo, template, amount, description: descriptionRaw, accountName: accountNameRaw });
-
         return { qrUrl, bankInfo: { bankId, accountNo, accountName: accountNameRaw, shortOrderId } };
     };
 
+    // Kiểm tra trạng thái thanh toán với trường dữ liệu đúng
     const checkPaymentStatus = async (orderId, total) => {
         try {
-            if (!orderId) {
+            const orderIdStr = String(orderId); // Ép kiểu thành chuỗi
+            if (!orderIdStr) {
                 console.error("orderId không hợp lệ:", orderId);
+                message.error("Mã đơn hàng không hợp lệ!");
                 return false;
             }
 
-            const response = await fetch('http://localhost:3002/api/vietqr', {
+            const response = await fetch("http://localhost:3002/api/vietqr", {
                 method: "GET",
                 headers: {
                     "Cache-Control": "no-cache",
@@ -83,7 +87,6 @@ const CustomerCart = () => {
                 return false;
             }
             const result = await response.json();
-            console.log("Dữ liệu từ VietQR API:", result);
 
             if (result.error) {
                 console.error("API trả về lỗi:", result);
@@ -91,30 +94,39 @@ const CustomerCart = () => {
                 return false;
             }
 
-            const transactions = result.data.filter(item => item["Mã GD"] !== "Mã GD");
-            console.log("Giao dịch:", transactions);
+            const transactions = result.data.filter((item) => item["Mã GD"] !== "Mã GD");
+            console.log("Danh sách giao dịch từ VietQR:", transactions);
 
-            const normalizedOrderId = orderId.toUpperCase();
+            const normalizedOrderId = orderIdStr.toUpperCase();
             const shortOrderId = normalizedOrderId.slice(0, 10);
+            const expectedTotal = parseInt(total);
+
+            console.log("Thông tin đơn hàng thực tế:", {
+                shortOrderId,
+                expectedTotal,
+            });
+
             const matchingTransaction = transactions.find((tx) => {
-                const description = tx["Mô tả"].toUpperCase();
-                const price = parseInt(tx["Giá trị"]);
-                const account = tx["Số tài khoản"];
+                const description = tx["Giá trị"]?.toUpperCase() || ""; // Lấy từ trường "Giá trị"
+                const price = parseInt(tx["Ngày diễn ra"]); // Lấy số tiền từ "Ngày diễn ra"
+
+                // Log chi tiết so sánh
                 console.log("So sánh giao dịch:", {
                     description,
                     shortOrderId,
+                    descriptionIncludesOrderId: description.includes(shortOrderId),
                     price,
-                    total: parseInt(total),
-                    account
+                    expectedTotal,
+                    priceMatches: price >= expectedTotal,
                 });
-                return (
-                    description.includes(shortOrderId) &&
-                    price >= parseInt(total) &&
-                    account === "0905859265"
-                );
+
+                return description.includes(shortOrderId) && price >= expectedTotal;
             });
 
-            console.log("Kiểm tra khớp:", { shortOrderId, total, matchingTransaction });
+            console.log("Kết quả khớp giao dịch:", {
+                matchingTransaction: matchingTransaction || "Không tìm thấy giao dịch phù hợp",
+            });
+
             return !!matchingTransaction;
         } catch (error) {
             console.error("Lỗi kiểm tra thanh toán:", error);
@@ -123,16 +135,19 @@ const CustomerCart = () => {
         }
     };
 
+    // Xử lý thanh toán thành công
     const handleSuccessfulPayment = async (orderId, paidCart) => {
         const userData = JSON.parse(localStorage.getItem("user"));
         const token = localStorage.getItem("token");
         try {
-            await axios.put(`/api/orders/${orderId}`, {
-                status: "Đã thanh toán",
-                updatedAt: new Date().toISOString(),
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axios.put(
+                `/api/orders/${orderId}`,
+                {
+                    status: "Đã thanh toán",
+                    updatedAt: new Date().toISOString(),
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
 
             const appointmentPromises = (paidCart || []).map((item) => {
                 if (item.type === "service") {
@@ -145,7 +160,7 @@ const CustomerCart = () => {
                         userId: userData._id,
                     };
                     return axios.post("/api/appointments", appointment, {
-                        headers: { Authorization: `Bearer ${token}` }
+                        headers: { Authorization: `Bearer ${token}` },
                     });
                 }
                 return Promise.resolve();
@@ -161,12 +176,13 @@ const CustomerCart = () => {
             message.success("Thanh toán thành công!");
             navigate("/customer/history");
         } catch (error) {
-            console.error("Lỗi xử lý thanh toán thành công:", error);
+            console.error("Lỗi xử lý thanh toán:", error);
             message.error("Lỗi khi hoàn tất thanh toán!");
             setIsProcessing(false);
         }
     };
 
+    // Xử lý thanh toán
     const checkout = async () => {
         const token = localStorage.getItem("token");
         const userData = JSON.parse(localStorage.getItem("user"));
@@ -179,17 +195,12 @@ const CustomerCart = () => {
             return;
         }
 
-        console.log("User Data:", userData);
-        console.log("Role:", userData.role);
-
-        // Verify token with server
         try {
             const response = await axios.get("/api/users/me", {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
             });
             const serverUserData = response.data.data;
             if (serverUserData._id !== userData._id || serverUserData.role !== userData.role) {
-                console.error("User data mismatch:", { local: userData, server: serverUserData });
                 message.error("Thông tin người dùng không đồng bộ. Vui lòng đăng nhập lại!");
                 localStorage.removeItem("token");
                 localStorage.removeItem("user");
@@ -197,7 +208,7 @@ const CustomerCart = () => {
                 return;
             }
         } catch (error) {
-            console.error("Error verifying user:", error);
+            console.error("Lỗi xác thực người dùng:", error);
             message.error("Không thể xác thực người dùng. Vui lòng đăng nhập lại!");
             localStorage.removeItem("token");
             localStorage.removeItem("user");
@@ -219,7 +230,11 @@ const CustomerCart = () => {
         const hasInvalidDate = cart.some((item) => {
             if (item.type === "service") {
                 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-                if (!dateRegex.test(item.date) || !moment(item.date, "YYYY-MM-DD", true).isValid() || moment(item.date).isBefore(moment().startOf("day"))) {
+                if (
+                    !dateRegex.test(item.date) ||
+                    !moment(item.date, "YYYY-MM-DD", true).isValid() ||
+                    moment(item.date).isBefore(moment().startOf("day"))
+                ) {
                     message.error(`Ngày của dịch vụ ${item.name} không hợp lệ!`);
                     return true;
                 }
@@ -235,7 +250,7 @@ const CustomerCart = () => {
         for (const item of foodItems) {
             try {
                 const response = await axios.get(`/api/products/${item.id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${token}` },
                 });
                 const foodData = response.data.data;
                 if (!foodData) {
@@ -268,7 +283,7 @@ const CustomerCart = () => {
                 name: item.name || "Không có tên",
                 picture: item.picture || "",
                 quantity: item.quantity || 1,
-                type: item.type || "food"
+                type: item.type || "food",
             })),
             total: cart.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0).toString(),
             timestamp: new Date().toISOString(),
@@ -276,91 +291,42 @@ const CustomerCart = () => {
             paymentMethod,
         };
 
-        console.log("Order Data gửi lên:", JSON.stringify(order, null, 2));
-
         try {
             const response = await axios.post("/api/orders", order, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
             });
-            console.log("Order response:", response.data);
-            const orderId = response.data.data._id;
-            setOrderId(orderId);
+            const newOrderId = response.data.data._id;
+            setOrderId(newOrderId);
 
             const updatePromises = foodItems.map(async (item) => {
                 const foodResponse = await axios.get(`/api/products/${item.id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${token}` },
                 });
                 const currentQuantity = foodResponse.data.data.quantity || 0;
                 const requestedQuantity = item.quantity || 1;
-                await axios.put(`/api/products/${item.id}`, {
-                    quantity: currentQuantity - requestedQuantity,
-                    updatedAt: new Date().toISOString(),
-                }, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                if (currentQuantity - requestedQuantity <= 0) {
-                    await axios.put(`/api/products/${item.id}`, {
-                        status: "Hết hàng",
+                await axios.put(
+                    `/api/products/${item.id}`,
+                    {
+                        quantity: currentQuantity - requestedQuantity,
                         updatedAt: new Date().toISOString(),
-                    }, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
+                    },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                if (currentQuantity - requestedQuantity <= 0) {
+                    await axios.put(
+                        `/api/products/${item.id}`,
+                        {
+                            status: "Hết hàng",
+                            updatedAt: new Date().toISOString(),
+                        },
+                        { headers: { Authorization: `Bearer ${token}` } }
+                    );
                 }
             });
 
             await Promise.all(updatePromises);
 
-            if (paymentMethod === "VietQR") {
-                NProgress.start();
-                const result = generateVietQR(orderId, order.total);
-                if (!result) {
-                    setIsProcessing(false);
-                    return;
-                }
-                setQrCodeUrl(result.qrUrl);
-                setBankInfo(result.bankInfo);
-                NProgress.done();
-                message.info("Quét mã QR để thanh toán!");
-
-                let checkInterval;
-                checkInterval = setInterval(async () => {
-                    try {
-                        if (!orderId) {
-                            clearInterval(checkInterval);
-                            return;
-                        }
-                        const isPaid = await checkPaymentStatus(orderId, order.total);
-                        if (isPaid) {
-                            clearInterval(checkInterval);
-                            await handleSuccessfulPayment(orderId, cart);
-                        }
-                    } catch (error) {
-                        console.error("Lỗi trong interval kiểm tra thanh toán:", error);
-                        clearInterval(checkInterval);
-                        setIsProcessing(false);
-                        setQrCodeUrl(null);
-                        setBankInfo(null);
-                        setOrderId(null);
-                        message.error("Lỗi khi kiểm tra trạng thái thanh toán!");
-                    }
-                }, 2000);
-
-                const timeout = setTimeout(() => {
-                    clearInterval(checkInterval);
-                    if (qrCodeUrl) {
-                        message.warning("Hết thời gian chờ thanh toán!");
-                        setQrCodeUrl(null);
-                        setBankInfo(null);
-                        setOrderId(null);
-                        setIsProcessing(false);
-                    }
-                }, 10 * 60 * 1000);
-
-                return () => {
-                    clearInterval(checkInterval);
-                    clearTimeout(timeout);
-                };
-            } else {
+            if (paymentMethod === "COD") {
                 const appointmentPromises = cart.map((item) => {
                     if (item.type === "service") {
                         const appointment = {
@@ -372,7 +338,7 @@ const CustomerCart = () => {
                             userId: userData._id,
                         };
                         return axios.post("/api/appointments", appointment, {
-                            headers: { Authorization: `Bearer ${token}` }
+                            headers: { Authorization: `Bearer ${token}` },
                         });
                     }
                     return Promise.resolve();
@@ -391,6 +357,61 @@ const CustomerCart = () => {
         }
     };
 
+    // Quản lý VietQR trong useEffect
+    useEffect(() => {
+        if (paymentMethod !== "VietQR" || !orderId) return;
+
+        NProgress.start();
+        const total = cart.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0).toString();
+        const result = generateVietQR(orderId, total);
+        if (!result) {
+            setIsProcessing(false);
+            NProgress.done();
+            return;
+        }
+        setQrCodeUrl(result.qrUrl);
+        setBankInfo(result.bankInfo);
+        NProgress.done();
+        message.info("Quét mã QR để thanh toán!");
+
+        const checkInterval = setInterval(async () => {
+            try {
+                const total = cart.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0).toString();
+                const isPaid = await checkPaymentStatus(orderId, total);
+                if (isPaid) {
+                    clearInterval(checkInterval);
+                    await handleSuccessfulPayment(orderId, cart);
+                }
+            } catch (error) {
+                console.error("Lỗi kiểm tra thanh toán:", error);
+                clearInterval(checkInterval);
+                setIsProcessing(false);
+                setQrCodeUrl(null);
+                setBankInfo(null);
+                setOrderId(null);
+                message.error("Lỗi khi kiểm tra trạng thái thanh toán!");
+            }
+        }, 2000);
+
+        const timeout = setTimeout(() => {
+            clearInterval(checkInterval);
+            if (qrCodeUrl) {
+                message.warning("Hết thời gian chờ thanh toán!");
+                setQrCodeUrl(null);
+                setBankInfo(null);
+                setOrderId(null);
+                setIsProcessing(false);
+            }
+        }, 10 * 60 * 1000);
+
+        return () => {
+            clearInterval(checkInterval);
+            clearTimeout(timeout);
+            NProgress.done();
+        };
+    }, [paymentMethod, orderId, cart]);
+
+    // Cập nhật số lượng
     const updateQuantity = (index, quantity) => {
         let updatedCart = [...cart];
         quantity = Math.max(1, parseInt(quantity));
@@ -399,6 +420,7 @@ const CustomerCart = () => {
         setCart(updatedCart);
     };
 
+    // Cập nhật ngày dịch vụ
     const updateDate = (index, date) => {
         let updatedCart = [...cart];
         updatedCart[index].date = date || null;
@@ -406,6 +428,7 @@ const CustomerCart = () => {
         setCart(updatedCart);
     };
 
+    // Xóa sản phẩm
     const removeItem = (index) => {
         let updatedCart = [...cart];
         updatedCart.splice(index, 1);
@@ -413,6 +436,7 @@ const CustomerCart = () => {
         setCart(updatedCart);
     };
 
+    // Tính tổng tiền
     const total = cart.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0);
 
     return (
@@ -438,7 +462,11 @@ const CustomerCart = () => {
                     {cart.map((item, index) => (
                         <Card key={index} style={{ marginBottom: 16, background: "var(--table-bg)" }}>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                <Image src={item.picture || "https://via.placeholder.com/100"} width={100} style={{ borderRadius: 8 }} />
+                                <Image
+                                    src={item.picture || "https://via.placeholder.com/100"}
+                                    width={100}
+                                    style={{ borderRadius: 8 }}
+                                />
                                 <div style={{ flex: 1, marginLeft: 16, color: "var(--text-color)" }}>
                                     <Paragraph style={{ color: "var(--text-color)" }}>
                                         {item.name || "Không có tên"}
@@ -466,7 +494,12 @@ const CustomerCart = () => {
                                             disabled={isProcessing}
                                         />
                                     )}
-                                    <Button danger icon={<DeleteOutlined />} onClick={() => removeItem(index)} disabled={isProcessing} />
+                                    <Button
+                                        danger
+                                        icon={<DeleteOutlined />}
+                                        onClick={() => removeItem(index)}
+                                        disabled={isProcessing}
+                                    />
                                 </div>
                             </div>
                         </Card>
@@ -483,8 +516,10 @@ const CustomerCart = () => {
                             {bankInfo && (
                                 <div style={{ margin: "0 auto", width: "100%", maxWidth: "500px", textAlign: "left" }}>
                                     <Paragraph style={{ color: "var(--text-color)", textAlign: "left" }}>
-                                        Hoặc chuyển khoản đến<br />
-                                        SỐ TÀI KHOẢN: <span
+                                        Hoặc chuyển khoản đến
+                                        <br />
+                                        SỐ TÀI KHOẢN:{" "}
+                                        <span
                                             style={{
                                                 fontWeight: "bold",
                                                 backgroundColor: "#f0f0f0",
@@ -492,7 +527,7 @@ const CustomerCart = () => {
                                                 marginLeft: 4,
                                                 marginRight: 8,
                                                 borderRadius: 4,
-                                                cursor: "pointer"
+                                                cursor: "pointer",
                                             }}
                                             onClick={() => {
                                                 navigator.clipboard.writeText(bankInfo.accountNo);
@@ -501,8 +536,10 @@ const CustomerCart = () => {
                                             title="Nhấn để sao chép"
                                         >
                                             {bankInfo.accountNo}
-                                        </span><br />
-                                        MÃ GIAO DỊCH: <span
+                                        </span>
+                                        <br />
+                                        MÃ GIAO DỊCH:{" "}
+                                        <span
                                             style={{
                                                 fontWeight: "bold",
                                                 backgroundColor: "#f0f0f0",
@@ -510,7 +547,7 @@ const CustomerCart = () => {
                                                 marginLeft: 4,
                                                 marginRight: 8,
                                                 borderRadius: 4,
-                                                cursor: "pointer"
+                                                cursor: "pointer",
                                             }}
                                             onClick={() => {
                                                 navigator.clipboard.writeText(bankInfo.shortOrderId);
@@ -519,14 +556,18 @@ const CustomerCart = () => {
                                             title="Nhấn để sao chép"
                                         >
                                             {bankInfo.shortOrderId}
-                                        </span><br />
-                                        SỐ TIỀN: <strong style={{ color: "green", fontWeight: "bold", fontSize: "16px" }}>
+                                        </span>
+                                        <br />
+                                        SỐ TIỀN:{" "}
+                                        <strong style={{ color: "green", fontWeight: "bold", fontSize: "16px" }}>
                                             {new Intl.NumberFormat("vi-VN", {
                                                 style: "currency",
-                                                currency: "VND"
+                                                currency: "VND",
                                             }).format(total)}
-                                        </strong><br />
-                                        NGÂN HÀNG: <strong>MB BANK</strong><br />
+                                        </strong>
+                                        <br />
+                                        NGÂN HÀNG: <strong>MB BANK</strong>
+                                        <br />
                                         CHỦ TÀI KHOẢN: <strong>{bankInfo.accountName}</strong>
                                     </Paragraph>
                                 </div>

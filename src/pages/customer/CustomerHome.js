@@ -100,7 +100,7 @@ const CustomerHome = () => {
                         </Button>
                     </div>
                     <Image
-                        src={"https://via.placeholder.com/400"} // Placeholder for background image
+                        src={background} // Placeholder for background image
                         style={{
                             width: "100%",
                             maxWidth: "400px",
@@ -158,7 +158,7 @@ const CustomerHome = () => {
                         </Paragraph>
                     </div>
                     <Image
-                        src={"https://via.placeholder.com/400"} // Placeholder for haven image
+                        src={haven} // Placeholder for haven image
                         style={{
                             width: "100%",
                             maxWidth: "400px",
