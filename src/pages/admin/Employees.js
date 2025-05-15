@@ -104,7 +104,7 @@ const Employees = () => {
             <Title level={2} style={{ color: "var(--text-color)" }}>
                 Quản lý nhân viên
             </Title>
-            <Button
+            {/* <Button
                 type="primary"
                 onClick={() => {
                     setEditingRecord(null);
@@ -113,7 +113,7 @@ const Employees = () => {
                 style={{ marginBottom: 16 }}
             >
                 Thêm nhân viên
-            </Button>
+            </Button> */}
             <CrudTable
                 data={data}
                 columns={columns}
