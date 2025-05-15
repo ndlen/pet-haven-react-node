@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import { Menu, Switch, Button, Card, Typography, message, InputNumber, Image, Spin, Form, Input, Select, Table, Pagination } from "antd";
-import { ShoppingCartOutlined, DeleteOutlined, HomeOutlined, MailOutlined, UserOutlined } from "@ant-design/icons";
+import { Routes, Route, useNavigate, useLocation, Link } from "react-router-dom";
+import { Menu, Switch, Button, Card, Typography, message, InputNumber, Image, Spin, Form, Input, Select, Table, Pagination, DatePicker } from "antd";
+import { ShoppingCartOutlined, DeleteOutlined, HomeOutlined, MailOutlined, UserOutlined, PhoneOutlined, LockOutlined, CalendarOutlined, ManOutlined } from "@ant-design/icons";
 import { ThemeContext } from "../context/ThemeContext";
 import moment from "moment";
 import axios from "axios";
@@ -1587,6 +1587,7 @@ const CustomerLogin = () => {
                 email: values.email,
                 password: values.password,
             });
+            // Sửa để truy cập đúng định dạng phản hồi từ backend
             const { token, user } = response.data.data;
             localStorage.setItem("token", token);
             localStorage.setItem("user", JSON.stringify(user));
@@ -1644,23 +1645,17 @@ const CustomerRegister = () => {
     const { theme } = useContext(ThemeContext);
     const navigate = useNavigate();
     const [form] = Form.useForm();
-    const [isEmailVerificationSent, setIsEmailVerificationSent] = useState(false);
 
     const handleSubmit = async (values) => {
-        if (!isEmailVerificationSent) {
-            message.error("Vui lòng nhấn 'Gửi link xác thực' và xác thực email trước khi đăng ký!");
-            return;
-        }
-
         const { fullname, email, phone, dob, gender, password, confirmPassword } = values;
 
         const dobRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
         if (!dobRegex.test(dob)) {
-            message.error("Ngày sinh phải có định dạng DD/MM/YYYY!");
+            message.error('Ngày sinh phải có định dạng DD/MM/YYYY!');
             return;
         }
 
-        const [day, month, year] = dob.split("/").map(Number);
+        const [day, month, year] = dob.split('/').map(Number);
         const dobDate = new Date(year, month - 1, day);
         if (
             isNaN(dobDate.getTime()) ||
@@ -1670,17 +1665,17 @@ const CustomerRegister = () => {
             year < 1900 ||
             dobDate > new Date()
         ) {
-            message.error("Ngày sinh không hợp lệ!");
+            message.error('Ngày sinh không hợp lệ!');
             return;
         }
 
         if (password !== confirmPassword) {
-            message.error("Mật khẩu xác nhận không khớp!");
+            message.error('Mật khẩu xác nhận không khớp!');
             return;
         }
 
         try {
-            const response = await axios.post("/api/auth/register", {
+            const response = await axios.post('/api/auth/register', {
                 fullname,
                 email,
                 phone,
@@ -1688,67 +1683,50 @@ const CustomerRegister = () => {
                 gender,
                 password,
             });
-            const { token, user } = response.data.data;
-            localStorage.setItem("token", token);
-            localStorage.setItem("user", JSON.stringify(user));
-            console.log("Stored User Data:", user);
-            message.success("Đăng ký thành công!");
+            const { user, message: msg } = response.data;
+            message.success(`${msg} Vui lòng kiểm tra email để xác thực tài khoản.`);
             form.resetFields();
-            setIsEmailVerificationSent(false);
-            navigate("/customer/home");
+            navigate('/customer/login');
         } catch (error) {
-            console.error("Registration error:", error);
-            message.error(error.response?.data?.error || "Không thể đăng ký tài khoản. Vui lòng thử lại!");
-        }
-    };
-
-    const sendVerification = async () => {
-        const values = form.getFieldsValue();
-        const { email } = values;
-
-        if (!email) {
-            message.error("Vui lòng nhập email trước khi gửi link xác thực!");
-            return;
-        }
-
-        try {
-            await axios.get("/api/auth/verify-email", { params: { email } });
-            setIsEmailVerificationSent(true);
-            message.success("Link xác thực đã được gửi đến email của bạn. Vui lòng kiểm tra!");
-        } catch (error) {
-            console.error("Error sending verification:", error);
-            message.error(error.response?.data?.error || "Lỗi khi gửi link xác thực!");
+            console.error('Registration error:', error);
+            message.error(error.response?.data?.error || 'Không thể đăng ký tài khoản. Vui lòng thử lại!');
         }
     };
 
     return (
-        <div style={{ padding: "40px 20px", background: "var(--background-color)", minHeight: "100vh" }}>
-            <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-                <Title level={2} style={{ color: "var(--text-color)", textAlign: "center", marginBottom: 24 }}>
+        <div style={{ padding: '40px 20px', background: 'var(--background-color)', minHeight: '100vh' }}>
+            <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+                <Title level={2} style={{ color: 'var(--text-color)', textAlign: 'center', marginBottom: 24 }}>
                     Đăng ký
                 </Title>
-                <Card style={{ maxWidth: 900, margin: "0 auto", background: "var(--modal-bg)" }}>
+                <Card style={{ maxWidth: 900, margin: '0 auto', background: 'var(--modal-bg)' }}>
                     <Form form={form} onFinish={handleSubmit} layout="vertical">
-                        <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+                        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
                             <div style={{ flex: 1, minWidth: 300 }}>
                                 <Form.Item
                                     name="fullname"
                                     label="Họ và tên"
-                                    rules={[{ required: true, message: "Vui lòng nhập họ và tên!" }]}
+                                    rules={[{ required: true, message: 'Vui lòng nhập họ và tên!' }]}
                                 >
                                     <Input placeholder="Nhập họ và tên" />
                                 </Form.Item>
                                 <Form.Item
                                     name="phone"
                                     label="Số điện thoại"
-                                    rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }]}
+                                    rules={[
+                                        { required: true, message: 'Vui lòng nhập số điện thoại!' },
+                                        { pattern: /^\+?[1-9]\d{8,14}$/, message: 'Số điện thoại không hợp lệ!' },
+                                    ]}
                                 >
                                     <Input placeholder="Nhập số điện thoại" />
                                 </Form.Item>
                                 <Form.Item
                                     name="password"
                                     label="Mật khẩu"
-                                    rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
+                                    rules={[
+                                        { required: true, message: 'Vui lòng nhập mật khẩu!' },
+                                        { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' },
+                                    ]}
                                 >
                                     <Input.Password placeholder="Nhập mật khẩu" />
                                 </Form.Item>
@@ -1757,21 +1735,24 @@ const CustomerRegister = () => {
                                 <Form.Item
                                     name="email"
                                     label="Email"
-                                    rules={[{ required: true, message: "Vui lòng nhập email!" }]}
+                                    rules={[
+                                        { required: true, message: 'Vui lòng nhập email!' },
+                                        { type: 'email', message: 'Email không hợp lệ!' },
+                                    ]}
                                 >
                                     <Input placeholder="Nhập email của bạn" />
                                 </Form.Item>
                                 <Form.Item
                                     name="dob"
                                     label="Ngày sinh (DD/MM/YYYY)"
-                                    rules={[{ required: true, message: "Vui lòng nhập ngày sinh!" }]}
+                                    rules={[{ required: true, message: 'Vui lòng nhập ngày sinh!' }]}
                                 >
                                     <Input placeholder="VD: 15/03/2000" />
                                 </Form.Item>
                                 <Form.Item
                                     name="gender"
                                     label="Giới tính"
-                                    rules={[{ required: true, message: "Vui lòng chọn giới tính!" }]}
+                                    rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
                                 >
                                     <Select placeholder="Chọn giới tính">
                                         <Select.Option value="male">Nam</Select.Option>
@@ -1782,22 +1763,19 @@ const CustomerRegister = () => {
                                 <Form.Item
                                     name="confirmPassword"
                                     label="Xác nhận mật khẩu"
-                                    rules={[{ required: true, message: "Vui lòng xác nhận mật khẩu!" }]}
+                                    rules={[{ required: true, message: 'Vui lòng xác nhận mật khẩu!' }]}
                                 >
                                     <Input.Password placeholder="Nhập lại mật khẩu" />
                                 </Form.Item>
                             </div>
                         </div>
-                        <Form.Item style={{ textAlign: "center" }}>
-                            <Button type="default" onClick={sendVerification} style={{ marginRight: 16 }}>
-                                Gửi link xác thực
-                            </Button>
+                        <Form.Item style={{ textAlign: 'center' }}>
                             <Button type="primary" htmlType="submit">
                                 Đăng ký
                             </Button>
                         </Form.Item>
-                        <div style={{ textAlign: "center" }}>
-                            <a onClick={() => navigate("/customer/login")}>Đã có tài khoản? Đăng nhập ngay</a>
+                        <div style={{ textAlign: 'center' }}>
+                            <a onClick={() => navigate('/customer/login')}>Đã có tài khoản? Đăng nhập ngay</a>
                         </div>
                     </Form>
                 </Card>

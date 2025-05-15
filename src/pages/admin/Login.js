@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Form, Input, Button, Typography, message } from "antd";
 import { useNavigate } from "react-router-dom";
-import { ThemeContext } from "../context/ThemeContext";
+import { ThemeContext } from "../../context/ThemeContext";
 import axios from "axios";
 
 const { Title } = Typography;

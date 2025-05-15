@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Button, Typography, message } from "antd";
-import CrudTable from "../components/CrudTable";
-import CrudForm from "../components/CrudForm";
+import CrudTable from "../../components/CrudTable";
+import CrudForm from "../../components/CrudForm";
 import axios from "axios";
-import { ThemeContext } from "../context/ThemeContext";
+import { ThemeContext } from "../../context/ThemeContext";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import { useNavigate } from "react-router-dom";
