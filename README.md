@@ -88,7 +88,7 @@ pet-haven/
 ### 1. Clone project
 
 ```sh
-git clone https://github.com/yourusername/pet-haven.git
+git clone https://github.com/ndlen/pet-haven.git
 cd pet-haven
 ```
 
@@ -269,8 +269,8 @@ EMAIL_PASS=your_gmail_app_password
 
 ## Liên hệ
 
-- Email: your.email@example.com
-- Facebook: https://facebook.com/yourprofile
+- Email: nguyenduclenqna@gmail.com
+- Facebook: https://facebook.com/duclenit
 
 ---
 
